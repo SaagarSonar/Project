@@ -1,0 +1,17 @@
+@media (max-width: 768px) {
+  .container {
+    width: 100%;
+  }
+  .row {
+    flex-direction: column;
+  }
+  .col-md-4 {
+    width: 100%;
+    padding: 15px 0;
+    text-align: center;
+  }
+}
+.Footer-Style{
+  background-color:rgb(219, 235, 239);
+  margin-top: 40px;
+}

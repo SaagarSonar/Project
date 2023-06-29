@@ -1,0 +1,86 @@
+.super-mechanic-services-heading {
+    color: 'orange';
+    text-align: 'center';
+}
+
+
+.training-partners{
+  font-size: 40px;
+  text-align: center;
+  margin: 25px 0px;
+}
+
+.body-container{
+  margin: 50px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.tp-item{
+  width: 200px;
+  padding: 0;
+  
+}
+
+.columnhome {
+  float: left;
+  width: 20%;
+  padding: 0 10px;
+}
+
+.rowhome{margin: 0 -5px;}
+
+.rowhome:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+@media screen and (max-width: 600px) {
+  .columnhome {
+    width: 100%;
+    display: block;
+    margin-bottom: 20px;
+  }
+}
+
+.cardhome {
+  box-shadow: 0 4px 8px 0 #212529;
+ 
+  text-align: center;
+  background-color: #212529;
+  border-radius: 6px;
+}
+
+.cardhome p{
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+}
+
+
+@media (max-width: 768px) {
+  .container {
+    width: 100%;
+  }
+  .row {
+    flex-direction: column;
+  }
+  .col-md-4 {
+    width: 100%;
+    padding: 15px 0;
+    text-align: center;
+  }
+}
+
+
+.column1 {
+  float: left;
+  width: 33.3%;
+  margin-bottom: 16px;
+  padding: 0 8px;
+}
+
+
+
