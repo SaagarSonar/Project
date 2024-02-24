@@ -1,0 +1,150 @@
+/*
+
+- @description For use in Omnistudio, Omniscripts or Integration procedures
+- Without sharing is needed to access other accounts and contact data not available to the authenticated user
+- The decision was made in this ticket https://synergynetau.visualstudio.com/Tribe-Utility-of-the-future/_workitems/edit/111315
+- @date /02/2024
+- @author Chandresh Khunt
+- @History:
+- 22/02/2024 - Initial class created
+  */
+  // _@description This global without sharing class,MyAccountUserService implements the vlocity_cmt.VlocityOpenInterface.
+
+global without sharing class MyAccountEditUserAccess implements vlocity_cmt.VlocityOpenInterface {
+    public static final String MY_ACCOUNT = 'My_Account';
+    public static final String APPEND_URL = '/s/users?c__service=';
+    public static final String ADMIN = 'Admin';
+    public static final String STANDARD_ACCESS = 'Standard Access';
+    public static final String RESTRICTED_ACCESS = 'Restricted Access';
+    public static final String RESTRICTED_AUTH_REP = 'Restricted Rep (pending)';
+    /**
+     * @description: This will enable a call to Site class functionality from an Integration Procedure
+     * @param methodName method name used
+     * @param inputMap the parameters from the Component
+     * @param outMap return to the component the values processed
+     * @param options optional parameters from the component
+     * @return Boolean indicating the success of the method invocation.
+ */
+    public Boolean invokeMethod(
+        String methodName,
+        Map<String, Object> inputMap,
+        Map<String, Object> outMap,
+        Map<String, Object> options
+    ) {
+        if (methodName.equals('GetUserInfo')){
+            GetUserInfo(inputMap, outMap);
+        }
+         else if  (methodName.equals('UpdateAccessLevel')){
+            UpdateAccessLevel(inputMap, outMap);
+        }
+        else if  (methodName.equals('getmysiteURL')){
+            getmysiteURL(inputMap, outMap);
+        }
+        else if  (methodName.equals('UpdateAdminAccessLevel')){
+            UpdateAdminAccessLevel(inputMap, outMap);
+        }
+        else if  (methodName.equals('GetAdminInfo')){
+            GetAdminInfo(inputMap, outMap);
+        }
+        return true;
+    }
+    
+    /**
+    * @description: The getContacts method retrieves a list of contacts based on last name and email.
+    * @param lastName The last name of the contact.
+    * @param firstName The first name of the contact.
+    * @param AccessLevel The AccessLevel of the contact.
+    */
+    // This method retrieves contact information (First Name and Last Name) associated with the provided ContextId.
+    public static void GetUserInfo(Map<String, Object> inputMap, Map<String, Object> outMap) {
+        // Extract the ContextId from the inputMap.
+    	Id serviceAccountId = (Id) inputMap.get('ContextId');
+        AccountContactRelation acr = [SELECT Id, contactId, MyAccountAccessLevel__c ,contact.FirstName, contact.Lastname 
+                                      FROM AccountContactRelation WHERE Id =:serviceAccountId WITH SECURITY_ENFORCED];
+        // Add the retrieved contact information to the output map.
+        outMap.put('FirstName',acr.contact.FirstName);
+        outMap.put('LastName',acr.contact.Lastname);
+        outMap.put('AccessLevel',acr.MyAccountAccessLevel__c);
+    }
+    /**
+    * @description: The getContacts method retrieves a list of contacts based on last name and email.
+    * @param lastName The last name of the contact.
+    * @param firstName The first name of the contact.
+    * @param AccessLevel The AccessLevel of the contact.
+    */
+    // This method retrieves contact information (First Name and Last Name) associated with the provided ContextId.
+    public static void GetAdminInfo(Map<String, Object> inputMap, Map<String, Object> outMap) {
+        // Extract the ContextId from the inputMap.
+    	Id serviceAccountId = (Id) inputMap.get('ContextId');
+        AccountContactRelation acr = [SELECT Id, contactId, MyAccountAccessLevel__c ,contact.FirstName, contact.Lastname 
+                                      FROM AccountContactRelation WHERE Id =:serviceAccountId WITH SECURITY_ENFORCED];
+        // Add the retrieved contact information to the output map.
+        outMap.put('FirstName',acr.contact.FirstName);
+        outMap.put('LastName',acr.contact.Lastname);
+        outMap.put('AccessLevel',acr.MyAccountAccessLevel__c);
+    }
+    /**
+    * @description: This method updates the access level of an AccountContactRelation record identified by the provided ContextId.
+    * @param MyAccountAccessLevel of the AccountContactRelation to be updated.
+    * @param acrId The ID of the AccountContactRelation to be updated.
+    * @param access The new access level.
+    */ 
+    public static void UpdateAccessLevel(Map<String, Object> inputMap, Map<String, Object> outMap) {
+      try{
+          if (AccountContactRelation.sObjectType.getDescribe().isupdateable()) {
+          // Extract the ContextId from the inputMap.
+          Id acrId = (Id) inputMap.get('ContextId');
+          // Create a new AccountContactRelation instance with the specified access level and the retrieved ContextId.   
+          AccountContactRelation acr= new AccountContactRelation(MyAccountAccessLevel__c =RESTRICTED_ACCESS, MA_AuthorisationLevel__c=RESTRICTED_AUTH_REP, Id=acrId);
+          // Update the AccountContactRelation record with the new access level.
+          update acr;
+          // Put the updated AccountContactRelation Id into the output map.
+          outMap.put('acr',acr.Id);
+          }
+        }catch(Exception ex){
+             // Handle and log any exceptions that may occur during the update process.
+            Nebula.Logger.error('MyAccountRemoveUser :: UpdateAccessLevel ' + ex.getMessage());
+            Nebula.Logger.saveLog();
+        }  
+    }
+    /**
+    * @description: This method updates the access level of an AccountContactRelation record identified by the provided ContextId.
+    * @param MyAccountAccessLevel of the AccountContactRelation to be updated.
+    * @param acrId The ID of the AccountContactRelation to be updated.
+    * @param access The new access level.
+    */ 
+    public static void UpdateAdminAccessLevel(Map<String, Object> inputMap, Map<String, Object> outMap) {
+      try{
+          if (AccountContactRelation.sObjectType.getDescribe().isupdateable()) {
+          // Extract the ContextId from the inputMap.
+          Id acrId = (Id) inputMap.get('ContextId');
+          // Create a new AccountContactRelation instance with the specified access level and the retrieved ContextId.   
+          AccountContactRelation acr= new AccountContactRelation(MyAccountAccessLevel__c = ADMIN, Id=acrId);
+          // Update the AccountContactRelation record with the new access level.
+          update acr;
+          // Put the updated AccountContactRelation Id into the output map.
+          outMap.put('acr',acr.Id);
+          }
+        }catch(Exception ex){
+             // Handle and log any exceptions that may occur during the update process.
+            Nebula.Logger.error('MyAccountRemoveUser :: UpdateAccessLevel ' + ex.getMessage());
+            Nebula.Logger.saveLog();
+        }  
+    }
+    /**
+     * @description: Method to retrieve the URL for navigation action in an Omniscript.
+     * @param inputMap A map containing input parameters, such as ServiceAccountId, FirstName, LastName, etc.
+     * @param outMap A map to store output parameters, such as the result message.
+     */
+    public static void getmysiteURL(Map<String, Object> inputMap, Map<String, Object> outMap) {
+        // Retrieve the service account ID from the input map
+        Id serviceAccountId = (Id) inputMap.get('ContextId');
+        // Query for the Site record using its name
+        Site mySite = [SELECT Id FROM Site WHERE Name =:MY_ACCOUNT WITH SECURITY_ENFORCED];
+        // Query for the SiteDetail record associated with the Site
+        SiteDetail mySiteDetail = [SELECT SecureURL FROM SiteDetail WHERE DurableId = :mySite.Id WITH SECURITY_ENFORCED];
+        // Construct the URL for navigation action in Omniscript
+        String mySiteURL= mySiteDetail.SecureURL + APPEND_URL + ServiceAccountId;
+        outMap.put('mySiteURL',mySiteURL);
+    }
+}
